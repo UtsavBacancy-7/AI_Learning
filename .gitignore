@@ -13,3 +13,8 @@
 !*.css
 !*.pdf
 Policy_RAG_Chatbot_Project_Plan.pdf
+# Keep README and its screenshot(s)
+!README.md
+!*.png
+!*.jpg
+!*.jpeg

@@ -128,3 +128,49 @@ button.primary, .primary {
     align-items: center !important;
     justify-content: center !important;
 }
+
+/* Highlighted "Refresh organizations" button — extra ring on top of the primary style */
+.refresh-btn {
+    margin-top: 6px !important;
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.15),
+        0 1px 2px rgba(37, 99, 235, 0.15),
+        0 4px 14px rgba(37, 99, 235, 0.18) !important;
+    font-weight: 600 !important;
+}
+.refresh-btn:hover {
+    box-shadow:
+        0 0 0 4px rgba(37, 99, 235, 0.22),
+        0 1px 2px rgba(37, 99, 235, 0.18),
+        0 6px 18px rgba(37, 99, 235, 0.22) !important;
+}
+
+/* Loaded Documents list in the sidebar */
+.doc-list { display: flex; flex-direction: column; gap: 8px; }
+.doc-row {
+    background: var(--app-surface-alt);
+    border: 1px solid var(--app-border);
+    border-left: 3px solid var(--app-accent);
+    border-radius: 10px;
+    padding: 10px 12px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.doc-row:hover { border-color: var(--app-accent); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08); }
+.doc-name { font-weight: 600; font-size: 14px; color: var(--app-text); }
+.doc-meta {
+    font-size: 12px;
+    color: var(--app-text-dim);
+    margin-top: 3px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+.empty-state {
+    font-size: 13px;
+    color: var(--app-text-dim);
+    padding: 16px;
+    text-align: center;
+    line-height: 1.6;
+    border: 1px dashed var(--app-border);
+    border-radius: 10px;
+    background: var(--app-surface-alt);
+}
