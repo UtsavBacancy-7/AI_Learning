@@ -1,0 +1,14 @@
+# Ignore everything by default; only Jupyter notebooks, stylesheets, and PDF
+# sample documents are tracked in this repo.
+*
+
+# Allow traversal into subdirectories so the rules below can match nested files
+!*/
+
+# Keep this file itself
+!.gitignore
+
+# Keep notebooks, CSS, and sample document PDFs (at any nesting level)
+!*.ipynb
+!*.css
+!*.pdf

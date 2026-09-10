@@ -1,0 +1,130 @@
+/* Policy Assistant — custom UI styling
+   Upload this file alongside RAG_Based_ChatBot.ipynb (same folder) on Kaggle/Colab/Jupyter.
+   The notebook loads it at runtime via: open("policy_assistant.css").read() -> gr.Blocks(css=...)
+*/
+
+:root {
+    --app-bg: #f5f6f8;
+    --app-surface: #ffffff;
+    --app-surface-alt: #f8f9fb;
+    --app-border: #e3e6ec;
+    --app-text: #10131a;
+    --app-text-dim: #6b7280;
+    --app-accent: #2563eb;
+    --app-accent-dim: #1d4ed8;
+}
+
+/* Wider console layout */
+.gradio-container {
+    max-width: min(1600px, 96vw) !important;
+    margin: 0 auto !important;
+    background: var(--app-bg) !important;
+}
+body { background: var(--app-bg) !important; }
+
+#app-header {
+    background: linear-gradient(120deg, #eef2ff 0%, #ffffff 60%);
+    border: 1px solid var(--app-border);
+    border-radius: 16px;
+    padding: 30px 34px;
+    margin-bottom: 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(16, 19, 26, 0.04);
+}
+#app-header::after {
+    content: "";
+    position: absolute;
+    top: -70px;
+    right: -70px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0) 70%);
+}
+#app-header h1 {
+    margin: 0;
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--app-text);
+}
+#app-header .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+    background: #e0e9ff;
+    border: 1px solid #c7d7fe;
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 12px;
+}
+#app-header p {
+    margin: 8px 0 0;
+    font-size: 14px;
+    color: var(--app-text-dim);
+    line-height: 1.6;
+    max-width: 760px;
+}
+
+#sidebar {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(16, 19, 26, 0.04);
+}
+#sidebar .sidebar-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--app-text-dim);
+    margin: 2px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+#main-panel {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 16px;
+    padding: 6px 18px 18px;
+    box-shadow: 0 1px 2px rgba(16, 19, 26, 0.04);
+}
+
+/* Generic component surfaces pick up the same light palette */
+.block, .form, .panel {
+    background: var(--app-surface) !important;
+    border-color: var(--app-border) !important;
+}
+label span, .label-wrap span { color: var(--app-text-dim) !important; }
+input, textarea, select {
+    background: var(--app-surface-alt) !important;
+    color: var(--app-text) !important;
+    border-color: var(--app-border) !important;
+}
+
+button.primary, .primary {
+    background: linear-gradient(180deg, var(--app-accent), var(--app-accent-dim)) !important;
+    border: none !important;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.15), 0 4px 14px rgba(37, 99, 235, 0.18) !important;
+    color: #ffffff !important;
+}
+
+/* Round icon-only send button (arrow) next to the question box */
+.send-icon-btn {
+    min-width: 48px !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
