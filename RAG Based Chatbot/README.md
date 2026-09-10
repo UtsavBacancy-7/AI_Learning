@@ -17,9 +17,26 @@ A multi-organization policy assistant that answers questions **strictly** from i
 ## Pipeline
 
 ```
-PDF Upload → Page-aware Text Extraction → Organization/Policy Tagging → Chunking
-   → Embeddings (Gemini) → Qdrant Cloud (persistent vector store) → Organization-filtered Retrieval
-   → Strict LLM Prompt → Answer (or the required "I couldn't find this information..." fallback)
+PDF Upload
+    ↓
+Page-Aware Text Extraction
+    ↓
+Organization / Policy Tagging
+    ↓
+Text Chunking
+    ↓
+Embeddings (Gemini)
+    ↓
+Qdrant Cloud (Persistent Vector Store)
+    ↓
+Organization-Filtered Retrieval
+    ↓
+Strict LLM Prompt
+    ↓
+Answer
+    ↓
+Fallback:
+"I couldn't find this information in the provided documents."
 ```
 
 1. **PDF Upload** — via `ipywidgets.FileUpload` in Section 1.6, one batch of PDFs at a time.
