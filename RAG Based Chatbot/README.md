@@ -14,6 +14,24 @@ A multi-organization policy assistant that answers questions **strictly** from i
 
 ![Chunk viewer modal](assets/screenshot-chunk-modal.png)
 
+## Pipeline
+
+```
+PDF Upload → Page-aware Text Extraction → Organization/Policy Tagging → Chunking
+   → Embeddings (Gemini) → Qdrant Cloud (persistent vector store) → Organization-filtered Retrieval
+   → Strict LLM Prompt → Answer (or the required "I couldn't find this information..." fallback)
+```
+
+1. **PDF Upload** — via `ipywidgets.FileUpload` in Section 1.6, one batch of PDFs at a time.
+2. **Page-aware Text Extraction** — `PyPDFLoader` reads each PDF page-by-page, so citations/chunks retain their source page number.
+3. **Organization/Policy Tagging** — the filename is parsed into `organization`, `policy_name`, `policy_version` (or falls back to a generic `"General"` organization if the filename doesn't follow the convention).
+4. **Chunking** — `RecursiveCharacterTextSplitter` splits each page into overlapping chunks, carrying the tagged metadata forward.
+5. **Embeddings** — each chunk is embedded with Gemini's `gemini-embedding-001`.
+6. **Qdrant Cloud** — chunks + metadata are stored in a single shared collection; re-uploading the same `(organization, policy_name)` replaces the old version.
+7. **Organization-filtered Retrieval** — at query time, similarity search is scoped to the selected organization's chunks only, so one company's policies can never answer another's questions.
+8. **Strict LLM Prompt** — the retrieved chunks are passed to Gemini with instructions to answer only from that context.
+9. **Answer** — returned as-is, or the required fallback message if nothing relevant was retrieved.
+
 ## What it does
 
 - Ingests policy PDFs, one organization/policy pair at a time, via a simple upload widget (`ipywidgets.FileUpload` — works the same in Kaggle, Colab, or plain Jupyter).
@@ -36,7 +54,6 @@ Python · LangChain · Google Gemini (`gemini-embedding-001` for embeddings, Gem
 | `LLM_Fundamentals_Basics.ipynb` | Companion notebook covering the underlying LLM/RAG concepts (frameworks, memory, embeddings, RAG basics) this project builds on. |
 | `policy_assistant.css` | Optional cosmetic styling for the Gradio UI (wide layout, button accents). Core layout/modal CSS is embedded in the notebook itself so the UI still looks right if this file isn't uploaded. |
 | `Sample Documents/` | 15 sample policy PDFs across 3 fictional organizations (`technova`, `databridge`, `git`) for testing multi-org isolation and version replacement. |
-| `Policy_RAG_Chatbot_Project_Plan.pdf` | The original project plan this notebook was scoped against. |
 
 ## Running it
 
@@ -53,5 +70,3 @@ Optional: upload `policy_assistant.css` alongside the notebook (same working dir
 - PDF policies only — one active version per `(organization, policy_name)`.
 - Organization and policy metadata are entered manually at upload time (via filename parsing), not auto-detected from document content.
 - No conversation history / multi-turn memory — each question is answered independently.
-
-Left for later: automatic policy metadata/version detection, DOCX/TXT/Web ingestion, authentication & roles, conversation history, and an evaluation dashboard.
