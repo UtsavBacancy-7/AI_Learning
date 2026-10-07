@@ -40,7 +40,26 @@ PDF Upload → Page-aware Text Extraction → Organization/Policy Tagging → Ch
 - Retrieval is **filtered by organization** at query time — one company's policies can never leak into another's answer.
 - Re-uploading a PDF for the same `(organization, policy_name)` replaces the old version; different policies for the same org (Leave, WFH, Travel, ...) all coexist.
 - Answers come from a strict prompt: only the retrieved context is used, and unsupported questions get exactly *"I couldn't find this information in the available policies."*
-- A Gradio UI lets you pick an organization + LLM model, chat, and inspect exactly which chunks are stored for any loaded document (via a modal, no page navigation needed).
+- A Gradio UI lets you pick an LLM model, upload and index a PDF, chat with it, and inspect exactly which chunks are stored for any loaded document (via a modal, no page navigation needed). The UI has its own upload control, so you don't have to use Section 1.6 at all if you'd rather upload and ask in the same place.
+- The UI is a single-screen layout: header, Configuration / Upload Document / Loaded Documents cards on the left (Loaded Documents is a collapsible section, closed by default, with its own scrollbar), and a chat panel on the right with a context bar, suggested-prompt pills and a pill-shaped input. Only the chat transcript scrolls; the rest of the page stays fixed to the viewport. Answers show the retrieved chunks (rank, page, score) beneath them.
+- Every tunable — model, temperature, chunk size/overlap, top-k, similarity threshold, strict mode — is driven by an environment variable with a sensible default (see **Configuration** below).
+
+## Configuration
+
+Set any of these as environment variables before running the Setup cells to override the defaults:
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `GEMINI_API_KEY` | Your Gemini API key (required) | *(none — required)* |
+| `GEMINI_MODEL` | Default Gemini model for answers | `gemini-3.5-flash-lite` |
+| `GEMINI_TEMPERATURE` | Sampling temperature (0.0–2.0); lower = more literal/consistent | `0.2` |
+| `EMBEDDING_MODEL` | Gemini embedding model name | *(blank = auto-detect)* |
+| `QDRANT_COLLECTION_NAME` | Qdrant Cloud collection name | `policy_documents` |
+| `CHUNK_SIZE` | Characters per chunk | `800` |
+| `CHUNK_OVERLAP` | Character overlap between chunks | `150` |
+| `TOP_K` | Number of chunks retrieved per question | `5` |
+| `SIMILARITY_THRESHOLD` | Minimum cosine similarity ([-1, 1]) for a chunk to count as relevant | `0.2` |
+| `STRICT_DOCUMENT_MODE` | Refuse to answer beyond the documents (`true`/`false`) | `true` |
 
 ## Stack
 
@@ -52,7 +71,7 @@ Python · LangChain · Google Gemini (`gemini-embedding-001` for embeddings, Gem
 |---|---|
 | `RAG_Based_ChatBot.ipynb` | The project notebook — pipeline (PDF → chunks → Qdrant → retrieval → strict RAG) + Gradio UI. |
 | `LLM_Fundamentals_Basics.ipynb` | Companion notebook covering the underlying LLM/RAG concepts (frameworks, memory, embeddings, RAG basics) this project builds on. |
-| `policy_assistant.css` | Optional cosmetic styling for the Gradio UI (wide layout, button accents). Core layout/modal CSS is embedded in the notebook itself so the UI still looks right if this file isn't uploaded. |
+| `policy_assistant.css` | Optional legacy styling for the Gradio UI. The current layout, cards, chat and modal CSS are all embedded in the notebook, so this file is not needed. |
 | `Sample Documents/` | 15 sample policy PDFs across 3 fictional organizations (`technova`, `databridge`, `git`) for testing multi-org isolation and version replacement. |
 
 ## Running it
@@ -60,10 +79,10 @@ Python · LangChain · Google Gemini (`gemini-embedding-001` for embeddings, Gem
 1. Open `RAG_Based_ChatBot.ipynb` in Kaggle, Colab, or Jupyter.
 2. **Setup**: run the install cell, then provide a **Gemini API key** ([Google AI Studio](https://aistudio.google.com/app/apikey)) and **Qdrant Cloud** credentials (free cluster at [cloud.qdrant.io](https://cloud.qdrant.io) — cluster URL + API key).
 3. Run **Section 1** (1.1–1.5) to build the pipeline.
-4. Run **Section 1.6** once to upload and index your policy PDFs (e.g. everything in `Sample Documents/`).
-5. Run **Section 2** to launch the Gradio console — pick an organization and model, then ask questions.
+4. Run **Section 1.6** to batch-upload and index your policy PDFs (e.g. everything in `Sample Documents/`) — or skip this and upload one at a time from the Gradio UI in the next step.
+5. Run **Section 2** to launch the Gradio console — upload a PDF there if you skipped step 4, pick a model, select a loaded document, then ask questions.
 
-Optional: upload `policy_assistant.css` alongside the notebook (same working directory) for the extra wide-layout/button styling.
+The Gradio UI's styling is embedded in the notebook (one `<style>` block), so no extra files are needed. It is built for current Gradio 5/6; `policy_assistant.css` is an optional leftover and isn't required.
 
 ## Scope (V1)
 
