@@ -1,0 +1,6 @@
+{"id": "fact-1", "type": "factual", "question": "TODO: a question whose answer is in one paragraph", "source": "GEP-Jun-2026.pdf", "expected_pages": [0], "expected_keywords": ["TODO"]}
+{"id": "table-1", "type": "table", "question": "TODO: a question answered by one table cell", "source": "GEP-Jun-2026.pdf", "expected_pages": [0], "expected_keywords": ["TODO"]}
+{"id": "chart-1", "type": "chart", "question": "TODO: a question answered by a chart or figure", "source": "GEP-Jun-2026.pdf", "expected_pages": [0], "expected_keywords": ["TODO"]}
+{"id": "multi-1", "type": "multi_section", "question": "TODO: a question that needs two sections", "source": "GEP-Jun-2026.pdf", "expected_keywords": ["TODO"]}
+{"id": "none-1", "type": "unanswerable", "question": "What is the favourite colour of the report's author?", "source": "GEP-Jun-2026.pdf"}
+{"id": "none-2", "type": "unanswerable", "question": "What is the recipe for a chocolate cake?"}

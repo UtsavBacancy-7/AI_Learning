@@ -18,3 +18,14 @@ Policy_RAG_Chatbot_Project_Plan.pdf
 !*.png
 !*.jpg
 !*.jpeg
+
+# Advance RAG Pipeline: track its source code, config, tests, docs and diagrams
+# (secrets stay out: .env is ignored by that folder's own .gitignore; only .env.example is kept)
+!Advance RAG Pipeline/**/*.py
+!Advance RAG Pipeline/**/*.yaml
+!Advance RAG Pipeline/**/*.html
+!Advance RAG Pipeline/**/*.svg
+!Advance RAG Pipeline/**/*.jsonl
+!Advance RAG Pipeline/**/*.md
+!Advance RAG Pipeline/requirements.txt
+!Advance RAG Pipeline/.env.example

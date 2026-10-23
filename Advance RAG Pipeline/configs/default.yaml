@@ -1,0 +1,54 @@
+paths:
+  raw_dir: data/raw
+  qdrant_local_path: data/processed/qdrant   # used when QDRANT_URL is empty
+  cache_dir: data/processed                  # Gemini vision results are cached here
+
+qdrant:
+  collection: docs
+
+parsing:
+  render_dpi: 150
+  describe_visuals: true      # Gemini vision for charts/images/scanned pages
+  max_vision_pages_per_run: 10  # free tier = 20 requests/day/model; the rest is kept for answers. 0 = no limit
+  min_drawings_for_chart: 25  # vector-drawing count that flags a page as chart-like
+  min_image_area_ratio: 0.04  # embedded image must cover >4% of page to count
+
+chunking:
+  target_tokens: 250        # prose chunk size (150-300 tokens)
+  dense_target_tokens: 200  # smaller chunks for number-heavy text
+  min_tokens: 50            # merge a smaller tail into the previous chunk
+  overlap_sentences: 1      # whole sentences repeated at the start of the next chunk
+  max_table_tokens: 1000    # larger tables split by rows, header repeated
+
+parent_child:              # used for long structured documents (outline / headings)
+  parent_max_tokens: 2500   # a section larger than this is split at sentence boundaries
+  parent_min_tokens: 300    # a section smaller than this is merged into the next one
+  child_target_tokens: 250   # searched chunks: 150-300 tokens, ~50 token sentence overlap
+  child_dense_target_tokens: 200
+  min_pages: 1              # router: every document gets parent sections (1 = no page minimum)
+  min_headings: 0           # router: headings needed when the PDF has no outline (0 = not required)
+
+embedding:
+  model: gemini-embedding-001
+  dim: 768
+
+retrieval:
+  top_k_candidates: 30   # per branch (dense / sparse)
+  max_context_tokens: 6000  # budget for the parent sections sent to the LLM
+  top_k_final: 8           # chunks sent to the LLM after reranking (5-10)
+  rerank_model: Xenova/ms-marco-MiniLM-L-12-v2   # small free cross-encoder (~120 MB, runs on ONNX, no PyTorch). Bigger option: BAAI/bge-reranker-base (1 GB)
+  min_rerank_score: 0.20   # below this best score, refuse to answer (tune on eval set)
+
+generation:
+  model: gemini-3.5-flash-lite        # AI Studio free limits for it: 15 requests/min, 500/day (2.5-flash: 5/min, 20/day)
+  vision_model: gemini-3.5-flash-lite
+  temperature: 0.0
+  answer_rerank: false         # draft several answers in ONE request and keep the best-supported one
+  answer_candidates: 3
+  candidate_temperature: 0.7
+  min_answer_support: 0.25    # best answer scoring below this -> refuse
+
+rate_limits:                 # keeps indexing and questions under the free-tier per-minute limits
+  generate_per_minute: 12    # per model. gemini-3.5-flash-lite allows 15 (gemini-2.5-flash only 5). 0 = no limit
+  embed_texts_per_minute: 90 # free tier allows 100 texts per minute; 0 = no limit
+  embed_tokens_per_minute: 25000  # free tier allows 30,000 embedding tokens per minute; 0 = no limit

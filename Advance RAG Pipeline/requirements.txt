@@ -1,0 +1,12 @@
+google-genai>=1.0
+qdrant-client[fastembed]>=1.12
+pymupdf>=1.24
+pymupdf4llm>=0.0.17
+pydantic>=2.7
+pyyaml>=6.0
+python-dotenv>=1.0
+fastapi>=0.115
+uvicorn>=0.30
+tenacity>=9.0
+pytest>=8.0
+python-multipart>=0.0.9

@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="830" viewBox="0 0 1600 830" font-family="Inter, 'Segoe UI', Arial, sans-serif">
+<defs>
+<marker id="ah" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3b4256"/></marker>
+<marker id="ahg" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#12805c"/></marker>
+</defs>
+<rect width="1600" height="830" fill="#ffffff"/>
+<text x="40" y="52" font-size="28" font-weight="800" fill="#141a2a">Advance RAG Pipeline - workflow</text>
+<text x="40" y="78" font-size="15" fill="#6b7388">PDF in, short cited answer out. Blue steps run locally, amber steps call Gemini, green steps use Qdrant.</text>
+<rect x="1010" y="36" width="20" height="20" rx="5" fill="#eef3ff" stroke="#3b5bdb" stroke-width="2"/>
+<text x="1038" y="52" font-size="15" fill="#4a5470">Local (no API)</text>
+<rect x="1180" y="36" width="20" height="20" rx="5" fill="#fff4e0" stroke="#e8890c" stroke-width="2"/>
+<text x="1208" y="52" font-size="15" fill="#4a5470">Gemini call</text>
+<rect x="1350" y="36" width="20" height="20" rx="5" fill="#e6f7ef" stroke="#12805c" stroke-width="2"/>
+<text x="1378" y="52" font-size="15" fill="#4a5470">Qdrant</text>
+<text x="40" y="118" font-size="14" font-weight="700" letter-spacing="1.5" fill="#6b7388">INDEXING  -  once per document, when you click Load &amp; index</text>
+<rect x="39" y="135" width="232" height="172" rx="16" fill="#f3f4f8" stroke="#6b7388" stroke-width="2"/>
+<circle cx="65" cy="163" r="14" fill="#6b7388"/>
+<text x="65" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+<text x="89" y="168" font-size="18" font-weight="700" fill="#141a2a">Upload PDF</text>
+<text x="57" y="197" font-size="14" fill="#4a5470">Saved to data/raw. No Gemini</text>
+<text x="57" y="217" font-size="14" fill="#4a5470">call. Status: Uploaded.</text>
+<rect x="297" y="135" width="232" height="172" rx="16" fill="#eef3ff" stroke="#3b5bdb" stroke-width="2"/>
+<circle cx="323" cy="163" r="14" fill="#3b5bdb"/>
+<text x="323" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+<text x="347" y="168" font-size="18" font-weight="700" fill="#141a2a">Parse</text>
+<text x="315" y="197" font-size="14" fill="#4a5470">PyMuPDF4LLM reads each page</text>
+<text x="315" y="217" font-size="14" fill="#4a5470">as Markdown in the right</text>
+<text x="315" y="237" font-size="14" fill="#4a5470">reading order across columns.</text>
+<text x="315" y="257" font-size="14" fill="#4a5470">Tables stay tables. PDF</text>
+<text x="315" y="277" font-size="14" fill="#4a5470">leftovers cleaned.</text>
+<line x1="273" y1="221.0" x2="294" y2="221.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="555" y="135" width="232" height="172" rx="16" fill="#fff4e0" stroke="#e8890c" stroke-width="2"/>
+<circle cx="581" cy="163" r="14" fill="#e8890c"/>
+<text x="581" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+<text x="605" y="168" font-size="18" font-weight="700" fill="#141a2a">Charts and images</text>
+<text x="573" y="197" font-size="14" fill="#4a5470">Gemini vision describes</text>
+<text x="573" y="217" font-size="14" fill="#4a5470">chart-like and large-image</text>
+<text x="573" y="237" font-size="14" fill="#4a5470">pages only. Max 10 per run,</text>
+<text x="573" y="257" font-size="14" fill="#4a5470">most chart-like first,</text>
+<text x="573" y="277" font-size="14" fill="#4a5470">cached.</text>
+<line x1="531" y1="221.0" x2="552" y2="221.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="813" y="135" width="232" height="172" rx="16" fill="#eef3ff" stroke="#3b5bdb" stroke-width="2"/>
+<circle cx="839" cy="163" r="14" fill="#3b5bdb"/>
+<text x="839" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+<text x="863" y="168" font-size="18" font-weight="700" fill="#141a2a">Chunk</text>
+<text x="831" y="197" font-size="14" fill="#4a5470">Sections become parents</text>
+<text x="831" y="217" font-size="14" fill="#4a5470">(300-2500 tokens), cut into</text>
+<text x="831" y="237" font-size="14" fill="#4a5470">children (~250 tokens). Whole</text>
+<text x="831" y="257" font-size="14" fill="#4a5470">sentences only. Tables never</text>
+<text x="831" y="277" font-size="14" fill="#4a5470">cut.</text>
+<line x1="789" y1="221.0" x2="810" y2="221.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="1071" y="135" width="232" height="172" rx="16" fill="#fff4e0" stroke="#e8890c" stroke-width="2"/>
+<circle cx="1097" cy="163" r="14" fill="#e8890c"/>
+<text x="1097" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+<text x="1121" y="168" font-size="18" font-weight="700" fill="#141a2a">Embed</text>
+<text x="1089" y="197" font-size="14" fill="#4a5470">Gemini embedding (768</text>
+<text x="1089" y="217" font-size="14" fill="#4a5470">numbers) for meaning, BM25</text>
+<text x="1089" y="237" font-size="14" fill="#4a5470">for keywords. Paced to the</text>
+<text x="1089" y="257" font-size="14" fill="#4a5470">free-tier limits.</text>
+<line x1="1047" y1="221.0" x2="1068" y2="221.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="1329" y="135" width="232" height="172" rx="16" fill="#e6f7ef" stroke="#12805c" stroke-width="2"/>
+<circle cx="1355" cy="163" r="14" fill="#12805c"/>
+<text x="1355" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">6</text>
+<text x="1379" y="168" font-size="18" font-weight="700" fill="#141a2a">Store</text>
+<text x="1347" y="197" font-size="14" fill="#4a5470">Qdrant: docs (children) and</text>
+<text x="1347" y="217" font-size="14" fill="#4a5470">docs_parents (sections). Re-</text>
+<text x="1347" y="237" font-size="14" fill="#4a5470">index deletes the old data,</text>
+<text x="1347" y="257" font-size="14" fill="#4a5470">then inserts the new.</text>
+<line x1="1305" y1="221.0" x2="1326" y2="221.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<path d="M1445.0 307 V348 H490 V397" fill="none" stroke="#12805c" stroke-width="2.2" stroke-dasharray="7 6" marker-end="url(#ahg)"/>
+<text x="900" y="341" font-size="13" fill="#12805c" text-anchor="middle">stored chunks are searched at question time</text>
+<text x="40" y="384" font-size="14" font-weight="700" letter-spacing="1.5" fill="#6b7388">ASKING  -  every question</text>
+<rect x="40" y="397" width="280" height="150" rx="16" fill="#f3f4f8" stroke="#6b7388" stroke-width="2"/>
+<circle cx="66" cy="425" r="14" fill="#6b7388"/>
+<text x="66" y="430" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">A</text>
+<text x="90" y="430" font-size="18" font-weight="700" fill="#141a2a">Question</text>
+<text x="58" y="459" font-size="14" fill="#4a5470">You type a question. Scope: all</text>
+<text x="58" y="479" font-size="14" fill="#4a5470">indexed documents or one.</text>
+<rect x="350" y="397" width="280" height="150" rx="16" fill="#e6f7ef" stroke="#12805c" stroke-width="2"/>
+<circle cx="376" cy="425" r="14" fill="#12805c"/>
+<text x="376" y="430" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">B</text>
+<text x="400" y="430" font-size="18" font-weight="700" fill="#141a2a">Hybrid search</text>
+<text x="368" y="459" font-size="14" fill="#4a5470">1 Gemini embedding call. Qdrant</text>
+<text x="368" y="479" font-size="14" fill="#4a5470">matches meaning and keywords,</text>
+<text x="368" y="499" font-size="14" fill="#4a5470">merged with RRF into ~30 chunks.</text>
+<line x1="322" y1="472.0" x2="347" y2="472.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="660" y="397" width="280" height="150" rx="16" fill="#eef3ff" stroke="#3b5bdb" stroke-width="2"/>
+<circle cx="686" cy="425" r="14" fill="#3b5bdb"/>
+<text x="686" y="430" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">C</text>
+<text x="710" y="430" font-size="18" font-weight="700" fill="#141a2a">Rerank</text>
+<text x="678" y="459" font-size="14" fill="#4a5470">A small local cross-encoder reads</text>
+<text x="678" y="479" font-size="14" fill="#4a5470">question and chunk together. Keeps</text>
+<text x="678" y="499" font-size="14" fill="#4a5470">the best 8.</text>
+<line x1="632" y1="472.0" x2="657" y2="472.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="970" y="397" width="280" height="150" rx="16" fill="#eef3ff" stroke="#3b5bdb" stroke-width="2"/>
+<circle cx="996" cy="425" r="14" fill="#3b5bdb"/>
+<text x="996" y="430" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">D</text>
+<text x="1020" y="430" font-size="18" font-weight="700" fill="#141a2a">Refuse check</text>
+<text x="988" y="459" font-size="14" fill="#4a5470">If even the best chunk scores below</text>
+<text x="988" y="479" font-size="14" fill="#4a5470">0.30, answer "I don't know" at</text>
+<text x="988" y="499" font-size="14" fill="#4a5470">once. No answer call.</text>
+<line x1="942" y1="472.0" x2="967" y2="472.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="1280" y="397" width="280" height="150" rx="16" fill="#eef3ff" stroke="#3b5bdb" stroke-width="2"/>
+<circle cx="1306" cy="425" r="14" fill="#3b5bdb"/>
+<text x="1306" y="430" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">E</text>
+<text x="1330" y="430" font-size="18" font-weight="700" fill="#141a2a">Context</text>
+<text x="1298" y="459" font-size="14" fill="#4a5470">Exact chunks first, then their</text>
+<text x="1298" y="479" font-size="14" fill="#4a5470">parent sections. Up to 6000 tokens,</text>
+<text x="1298" y="499" font-size="14" fill="#4a5470">numbered [1], [2]...</text>
+<line x1="1252" y1="472.0" x2="1277" y2="472.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="40" y="618" width="280" height="130" rx="16" fill="#fff4e0" stroke="#e8890c" stroke-width="2"/>
+<circle cx="66" cy="646" r="14" fill="#e8890c"/>
+<text x="66" y="651" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">F</text>
+<text x="90" y="651" font-size="18" font-weight="700" fill="#141a2a">Gemini drafts</text>
+<text x="58" y="680" font-size="14" fill="#4a5470">3 draft answers in ONE request.</text>
+<text x="58" y="700" font-size="14" fill="#4a5470">Rules come from ANSWER_PROMPT.</text>
+<rect x="350" y="618" width="280" height="130" rx="16" fill="#eef3ff" stroke="#3b5bdb" stroke-width="2"/>
+<circle cx="376" cy="646" r="14" fill="#3b5bdb"/>
+<text x="376" y="651" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">G</text>
+<text x="400" y="651" font-size="18" font-weight="700" fill="#141a2a">Answer rerank</text>
+<text x="368" y="680" font-size="14" fill="#4a5470">Scores each draft: support,</text>
+<text x="368" y="700" font-size="14" fill="#4a5470">numbers, wording, citations. Keeps</text>
+<text x="368" y="720" font-size="14" fill="#4a5470">the best, drops unsupported lines.</text>
+<line x1="322" y1="683.0" x2="347" y2="683.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="660" y="618" width="280" height="130" rx="16" fill="#eef3ff" stroke="#3b5bdb" stroke-width="2"/>
+<circle cx="686" cy="646" r="14" fill="#3b5bdb"/>
+<text x="686" y="651" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">H</text>
+<text x="710" y="651" font-size="18" font-weight="700" fill="#141a2a">Tidy and cite</text>
+<text x="678" y="680" font-size="14" fill="#4a5470">Removes repeats, writes 91%, keeps</text>
+<text x="678" y="700" font-size="14" fill="#4a5470">ONE clearly supporting source per</text>
+<text x="678" y="720" font-size="14" fill="#4a5470">claim.</text>
+<line x1="632" y1="683.0" x2="657" y2="683.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<rect x="970" y="618" width="280" height="130" rx="16" fill="#f3f4f8" stroke="#6b7388" stroke-width="2"/>
+<circle cx="996" cy="646" r="14" fill="#6b7388"/>
+<text x="996" y="651" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">I</text>
+<text x="1020" y="651" font-size="18" font-weight="700" fill="#141a2a">Answer in the UI</text>
+<text x="988" y="680" font-size="14" fill="#4a5470">Text with [n] citations. Click one:</text>
+<text x="988" y="700" font-size="14" fill="#4a5470">full source text and the PDF page.</text>
+<line x1="942" y1="683.0" x2="967" y2="683.0" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<path d="M1420.0 547 V581 H180.0 V615" fill="none" stroke="#3b4256" stroke-width="2.2" marker-end="url(#ah)"/>
+<text x="1110.0" y="567" text-anchor="middle" font-size="13" fill="#c92a2a">refused: no Gemini answer call</text>
+<text x="40" y="802" font-size="14" fill="#6b7388">Gemini calls per question: 1 embedding + 1 answer request. Reranking, scoring and tidy-up run on your own machine.</text>
+</svg>
