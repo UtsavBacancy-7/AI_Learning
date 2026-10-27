@@ -14,7 +14,8 @@ def get_client(cfg: Config) -> QdrantClient:
     # Qdrant server/cloud if QDRANT_URL is set, otherwise local on-disk
     url = os.getenv("QDRANT_URL")
     if url:
-        return QdrantClient(url=url, api_key=os.getenv("QDRANT_API_KEY") or None)
+        return QdrantClient(url=url, api_key=os.getenv("QDRANT_API_KEY") or None,
+                            timeout=cfg.qdrant.timeout_seconds)
     cfg.paths.qdrant_local_path.mkdir(parents=True, exist_ok=True)
     return QdrantClient(path=str(cfg.paths.qdrant_local_path))
 

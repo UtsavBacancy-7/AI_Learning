@@ -57,6 +57,7 @@
   .doc .bot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; padding-top:10px; border-top:1px solid var(--line); font-size:13px; color:var(--faint); }
   .doc.sel .bot { color:var(--blue); font-weight:500; }
   .doc .bot .l { display:flex; align-items:center; gap:7px; } .doc .bot .l i { width:6px; height:6px; border-radius:50%; background:var(--blue); }
+  .btns { display:flex; gap:6px; margin-left:auto; }
   .act { display:inline-flex; align-items:center; gap:7px; border:0; background:none; color:var(--muted); font-size:13.5px; font-weight:500; padding:5px 10px; border-radius:7px; }
   .act:hover { background:var(--soft); color:var(--blue); }
   .act.primary { background:var(--blue); color:#fff; } .act.primary:hover { background:#1d4fd0; color:#fff; }
@@ -219,6 +220,7 @@ const svg = (d, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" 
 const ICON = {
   upload: svg('<path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M20 16v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3"/>'),
   file: svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>', 20),
+  pdf: svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>', 15),
   eye: svg('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', 15),
   check: svg('<path d="M5 12l5 5L20 7"/>', 18),
   checkc: svg('<circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><path d="M8 12l3 3 5-6" stroke="#fff"/>', 15),
@@ -337,14 +339,23 @@ function renderDocs() {
     info.append(nm, el("div", "meta", [chunks, fmtSize(d.size), fmtDate(d.modified)].join(" • ")));
     top.append(info, el("span", "pill " + d.status, { indexed: "Indexed", uploaded: "Uploaded", processing: "Processing" }[d.status]));
 
+    // Bottom row: the selected card shows only buttons (the blue dot already marks it).
+    // Indexed document -> View PDF + View Chunks; any other document -> View PDF only.
     const bot = el("div", "bot"), left = el("span", "l");
-    if (sel) { left.append(el("i"), document.createTextNode("Selected for Viewing")); }
-    else left.textContent = d.status === "indexed" ? "Qdrant · " + d.collection : d.status === "processing" ? "Being processed..." : "Awaiting indexing";
+    if (!sel) left.textContent = d.status === "indexed" ? "Qdrant · " + d.collection : d.status === "processing" ? "Being processed..." : "Awaiting indexing";
     bot.append(left);
-    const act = el("button", "act" + (sel && d.status === "indexed" ? " primary" : ""));
-    if (d.status === "indexed") { act.append(iconEl("eye"), document.createTextNode("View Chunks")); act.onclick = (e) => { e.stopPropagation(); selectDoc(d.name); openModal(); }; }
-    else { act.append(iconEl("eye"), document.createTextNode("View PDF")); act.onclick = (e) => { e.stopPropagation(); window.open("/pdf/" + encodeURIComponent(d.name), "_blank"); }; }
-    bot.append(act);
+    const btns = el("div", "btns");
+    const pdf = el("button", "act");
+    pdf.append(iconEl("pdf"), document.createTextNode("View PDF"));
+    pdf.onclick = (e) => { e.stopPropagation(); window.open("/pdf/" + encodeURIComponent(d.name), "_blank"); };
+    btns.append(pdf);
+    if (d.status === "indexed") {
+      const chunks = el("button", "act" + (sel ? " primary" : ""));
+      chunks.append(iconEl("eye"), document.createTextNode("View Chunks"));
+      chunks.onclick = (e) => { e.stopPropagation(); selectDoc(d.name); openModal(); };
+      btns.append(chunks);
+    }
+    bot.append(btns);
     card.append(top, bot);
     card.onclick = () => selectDoc(d.name);
     return card;
@@ -583,7 +594,16 @@ async function loadModal(reset) {
     const q = new URLSearchParams({ source: selected, offset: moff, limit: MPAGE });
     if (tab !== "all") q.set("type", tab);
     if (mq) q.set("q", mq);
-    let data; try { data = await (await fetch("/chunks?" + q)).json(); } catch (e) { return; }
+    let data;
+    try {
+      const resp = await fetch("/chunks?" + q);
+      data = await resp.json();
+      if (!resp.ok) throw new Error(data.detail || resp.statusText);   // e.g. Qdrant did not answer in time
+    } catch (e) {
+      list.replaceChildren(el("div", "empty", "Could not load the chunks: " + e.message));
+      $("mshow").textContent = "";
+      return;
+    }
     mcounts = data.counts; mtotal = data.total;
     list.querySelector(".more")?.remove();
     data.items.forEach((c) => list.append(chunkCard(c, terms)));

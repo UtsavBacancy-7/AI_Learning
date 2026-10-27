@@ -5,6 +5,7 @@ paths:
 
 qdrant:
   collection: docs
+  timeout_seconds: 60   # Qdrant Cloud can be slow from far away; the library default is only 5
 
 parsing:
   render_dpi: 150

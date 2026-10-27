@@ -17,6 +17,7 @@ class Paths(BaseModel):
 
 class QdrantCfg(BaseModel):
     collection: str
+    timeout_seconds: int = 60  # how long to wait for Qdrant before giving up (client default: 5)
 
 
 class Parsing(BaseModel):

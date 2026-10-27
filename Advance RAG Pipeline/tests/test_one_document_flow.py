@@ -153,3 +153,45 @@ def test_ask_returns_the_full_cited_text_and_page_for_each_source(app_client):
                   "type": "text", "snippet": "short", "text": "The full entry. GPO produced 15,901,600 passports in FY 2018."}])
     s = c.post("/ask", json={"question": "passports?"}).json()["sources"][0]
     assert s["text"].startswith("The full entry") and s["page"] == 8 and s["n"] == 1
+
+
+def test_chunk_viewer_reads_qdrant_once_per_minute_and_after_a_change(app_client, monkeypatch):
+    c, pipe, _ = app_client
+    pipe.is_indexed = lambda: True
+    calls = []
+    pts = [types.SimpleNamespace(id="i1", payload={"source": "a.pdf", "type": "text", "page": 1, "text": "hello"})]
+    monkeypatch.setattr(api, "scroll_all", lambda client, cfg, source=None: calls.append(source) or pts)
+    api._chunk_cache.clear()
+
+    c.get("/chunks", params={"source": "a.pdf"})
+    c.get("/chunks", params={"source": "a.pdf", "type": "text"})  # another tab: served from memory
+    assert calls == ["a.pdf"]
+
+    c.post("/upload", files=[("files", ("a.pdf", b"%PDF-new"))])  # a changed document drops the memory
+    c.get("/chunks", params={"source": "a.pdf"})
+    assert calls == ["a.pdf", "a.pdf"]
+
+
+def test_a_qdrant_timeout_becomes_a_clear_503_not_a_crash(app_client, monkeypatch):
+    from qdrant_client.http.exceptions import ResponseHandlingException
+
+    c, pipe, _ = app_client
+    pipe.is_indexed = lambda: True
+    api._chunk_cache.clear()
+
+    def timeout(*a, **k):
+        raise ResponseHandlingException(Exception("The read operation timed out"))
+
+    monkeypatch.setattr(api, "scroll_all", timeout)
+    r = c.get("/chunks", params={"source": "a.pdf"})
+    assert r.status_code == 503 and "Qdrant did not answer" in r.json()["detail"]
+
+
+def test_the_qdrant_client_gets_the_configured_timeout(monkeypatch):
+    import rag.store as store
+
+    seen = {}
+    monkeypatch.setenv("QDRANT_URL", "http://example.invalid:6333")
+    monkeypatch.setattr(store, "QdrantClient", lambda **kw: seen.update(kw))
+    store.get_client(types.SimpleNamespace(qdrant=types.SimpleNamespace(timeout_seconds=45)))
+    assert seen["timeout"] == 45 and seen["url"] == "http://example.invalid:6333"

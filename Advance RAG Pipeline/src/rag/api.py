@@ -5,6 +5,7 @@ Run:  uvicorn rag.api:app --app-dir src --port 8000   then open http://localhost
 import json
 import logging
 import threading
+import time
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, UploadFile
@@ -17,13 +18,26 @@ from .logging_setup import setup_logging
 from .pipeline import NotIndexed, RAGPipeline
 from .store import delete_source, scroll_all
 
+from fastapi import Request
+from fastapi.responses import JSONResponse
+from qdrant_client.http.exceptions import ResponseHandlingException
+
 setup_logging()  # writes logs/rag.log
 log = logging.getLogger("rag.api")
 UI_FILE = Path(__file__).parent / "ui" / "index.html"
 
 app = FastAPI(title="Advance RAG Pipeline")
+
+
+@app.exception_handler(ResponseHandlingException)
+async def qdrant_unreachable(request: Request, exc: ResponseHandlingException):
+    log.error("Qdrant did not answer: %s", exc)
+    return JSONResponse(status_code=503, content={
+        "detail": "Qdrant did not answer in time. Check your internet connection and QDRANT_URL, then try again."})
 _pipeline: RAGPipeline | None = None
 _index_lock = threading.Lock()  # only one document is processed at a time
+_chunk_cache: dict[str | None, tuple[float, list[dict]]] = {}  # source -> (time loaded, chunks)
+CHUNK_CACHE_SECONDS = 60  # the chunk viewer asks again for every tab and search; do not re-read Qdrant each time
 _processing: str | None = None  # name of the document being processed
 
 
@@ -116,7 +130,12 @@ def chunks(source: str | None = None, type: str | None = None, q: str | None = N
     pipe = get_pipeline()
     if not pipe.is_indexed():
         return {"total": 0, "counts": {}, "items": []}
-    payloads = [{**p.payload, "_id": str(p.id)} for p in scroll_all(pipe.client, pipe.cfg, source)]
+    cached = _chunk_cache.get(source)
+    if cached and time.time() - cached[0] < CHUNK_CACHE_SECONDS:
+        payloads = cached[1]
+    else:
+        payloads = [{**p.payload, "_id": str(p.id)} for p in scroll_all(pipe.client, pipe.cfg, source)]
+        _chunk_cache[source] = (time.time(), payloads)
     return page_chunks(payloads, type, max(offset, 0), min(max(limit, 1), 200), q)
 
 
@@ -161,6 +180,7 @@ async def upload(files: list[UploadFile]) -> dict:
         if pipe.doc_status(name):  # new content under an old name: the old index is stale
             delete_source(pipe.client, pipe.cfg, name)
         saved.append(name)
+    _chunk_cache.clear()
     return {"saved": saved}
 
 
@@ -191,6 +211,7 @@ def index_stream(source: str, force: bool = False) -> StreamingResponse:
             yield sse({"event": "error", "message": str(e) or type(e).__name__})
         finally:
             _processing = None
+            _chunk_cache.clear()  # the stored chunks changed
             _index_lock.release()
 
     return StreamingResponse(events(), media_type="text/event-stream")
